@@ -37,6 +37,7 @@ power loss.
 | Network | 10/100 Ethernet |
 | Storage | 1 MB AT45DB081E dataflash, LittleFS file system |
 | Status LEDs | On-board red/green LEDs used for the setup-error indication |
+| MD button | On-board setup (MD) button. Hold for 5 s and release to reset all settings to their defaults (§4.1) |
 
 Input lines are numbered **Input 1 … Input 16**, in socket order:
 
@@ -51,11 +52,18 @@ Input lines are numbered **Input 1 … Input 16**, in socket order:
 
 | Service | Setting |
 |---|---|
-| IP addressing | DHCP (default) or static IP / netmask / gateway |
+| IP addressing | Static **192.168.1.40** (factory default), or DHCP, or a static IP / netmask / gateway of your choosing |
 | DNS | 8.8.8.8, 5 s timeout |
 | Time sync | SNTP against 216.239.35.0 (time.google.com), applied with the configured time zone |
 | Web console | HTTP, port 80, 3 concurrent connections |
 | Outgoing email | SMTP client, TLS (implicit), port 465 by default, LOGIN authentication, 120 s timeout |
+
+**Default IP address.** Out of the box the device uses the static address
+`192.168.1.40`. This is a placeholder so the device can be reached on first
+power-up; you will most likely want to change it. On the Settings page,
+Ethernet tab, either enable **DHCP** so the device obtains an address from
+your network, or enter a static IP, netmask and gateway of your own choosing.
+Restart the device for the new address to take effect.
 
 The device needs outbound access to the SMTP server port and to the DNS and
 SNTP servers.
@@ -83,6 +91,15 @@ Title: **Device Console**. Two accounts: `admin` (full access) and `user`
 ![Settings page, SMTP tab](https://raw.githubusercontent.com/tibbotech/alarm_notifier_assets/refs/heads/master/assets/alarm_notifier_settings_smtp.png)
 
 **Restart the device after changing any setting.**
+
+#### Resetting settings to defaults
+
+Press and hold the on-board **MD button** for **5 seconds**, then release it.
+All settings are initialized back to their default values (including the
+network settings, so the device returns to the static address
+`192.168.1.40`, see §3). The reset is recorded in the event log as a
+`SETTINGS_INIT` event (§9). Releasing the button before 5 seconds have
+elapsed does nothing.
 
 ### 4.2 Configuration pages
 
@@ -264,6 +281,7 @@ and message:
 |---|---|
 | SYSTEM_STARTED | Device booted |
 | SYTEM_ERROR | Setup validation failed (message included) |
+| SETTINGS_INIT | All settings were reset to their default values by holding the MD button for 5 s (§4.1) |
 | NETWORK_CONNECTED / NETWORK_DISCONNECTED | Ethernet link state changed |
 | INPUT_CHANGED | Any of the 16 inputs changed state |
 | ALARM_STARTED / ALARM_CLEARED | An alarm episode opened / closed |
@@ -274,7 +292,10 @@ and message:
 ## 10. Commissioning checklist
 
 1. Mount the unit, wire the inputs and power it.
-2. Connect Ethernet. Open `http://<device IP>/` and log in as `admin`.
+2. Connect Ethernet. The device defaults to the static address
+   `192.168.1.40`; open `http://192.168.1.40/`. Then,
+   on the Settings page, Ethernet tab, enable DHCP or set an IP address of
+   your choosing (§3).
 3. Fill in the **SMTP** settings.
 4. Create **Retry Policies**, **Contacts**, **Email Templates**, **Alert
    Recipients** and finally **Alarm Rules** for every input to monitor.
